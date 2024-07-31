@@ -41,3 +41,12 @@
 .read-the-docs {
   color: #888;
 }
+.bg-danger {
+  background-color: red !important;
+  color: white;
+}
+
+.alert {
+  color: white;
+  font-weight: bold;
+}

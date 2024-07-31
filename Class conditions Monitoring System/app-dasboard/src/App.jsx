@@ -3,10 +3,10 @@ import "./App.css";
 
 function App() {
   const [sensorVals, setSensorVals] = useState({
-    sensor1: { value: null, unit: "°C", icon: "temperature" },
-    sensor2: { value: null, unit: "%", icon: "humidity" },
-    sensor3: { value: null, unit: "ppm", icon: "CO2" },
-    sensor4: { value: null, unit: "dB", icon: "sound" },
+    sensor1: { value: null, unit: "°C", icon: "temperature", threshold: 28 },
+    sensor2: { value: null, unit: "%", icon: "humidity", threshold: 70 },
+    sensor3: { value: null, unit: "ppm", icon: "CO2", threshold: 500 },
+    sensor4: { value: null, unit: "dB", icon: "sound", threshold: 85 },
   });
 
   const getSensorValues = async () => {
@@ -21,12 +21,12 @@ function App() {
         sensor4: data.find(sensor => sensor.id === "snd"),
       };
 
-      setSensorVals({
-        sensor1: { value: sensorData.sensor1.value.value, unit: "°C", icon: "temperature" },
-        sensor2: { value: sensorData.sensor2.value.value, unit: "%", icon: "humidity" },
-        sensor3: { value: sensorData.sensor3.value.value, unit: "ppm", icon: "CO2" },
-        sensor4: { value: sensorData.sensor4.value.value, unit: "dB", icon: "sound" },
-      });
+      setSensorVals(prevState => ({
+        sensor1: { ...prevState.sensor1, value: sensorData.sensor1.value.value },
+        sensor2: { ...prevState.sensor2, value: sensorData.sensor2.value.value },
+        sensor3: { ...prevState.sensor3, value: sensorData.sensor3.value.value },
+        sensor4: { ...prevState.sensor4, value: sensorData.sensor4.value.value },
+      }));
     } catch (error) {
       console.log(error);
     }
@@ -34,9 +34,13 @@ function App() {
 
   useEffect(() => {
     getSensorValues();
-    const interval = setInterval(getSensorValues, 10000); // Update every 60 seconds
+    const interval = setInterval(getSensorValues, 10000); // Update every 10 seconds
     return () => clearInterval(interval); // Clear interval on component unmount
   }, []);
+
+  const checkThreshold = (sensor) => {
+    return sensor.value !== null && sensor.value > sensor.threshold;
+  };
 
   return (
     <>
@@ -45,7 +49,7 @@ function App() {
         <div className="row">
           {/* Temperature Sensor */}
           <div className="col-md-3">
-            <div className="card mb-4">
+            <div className={`card mb-4 ${checkThreshold(sensorVals.sensor1) ? "bg-danger" : ""}`}>
               <div className="card-body">
                 <h2 className="card-title">Temperature Sensor</h2>
                 <p className="card-text" id="t1">
@@ -56,13 +60,14 @@ function App() {
                 <p className="card-subtext">
                   <i className={`icon-${sensorVals.sensor1.icon}`}></i>
                 </p>
+                {checkThreshold(sensorVals.sensor1) && <p className="alert">Threshold breached!</p>}
               </div>
             </div>
           </div>
 
           {/* Humidity Sensor */}
           <div className="col-md-3">
-            <div className="card mb-4">
+            <div className={`card mb-4 ${checkThreshold(sensorVals.sensor2) ? "bg-danger" : ""}`}>
               <div className="card-body">
                 <h2 className="card-title">Humidity Sensor</h2>
                 <p className="card-text" id="t2">
@@ -73,13 +78,14 @@ function App() {
                 <p className="card-subtext">
                   <i className={`icon-${sensorVals.sensor2.icon}`}></i>
                 </p>
+                {checkThreshold(sensorVals.sensor2) && <p className="alert">Threshold breached!</p>}
               </div>
             </div>
           </div>
 
           {/* Air Quality Sensor */}
           <div className="col-md-3">
-            <div className="card mb-4">
+            <div className={`card mb-4 ${checkThreshold(sensorVals.sensor3) ? "bg-danger" : ""}`}>
               <div className="card-body">
                 <h2 className="card-title">Air Quality Sensor</h2>
                 <p className="card-text" id="t3">
@@ -90,13 +96,14 @@ function App() {
                 <p className="card-subtext">
                   <i className={`icon-${sensorVals.sensor3.icon}`}></i>
                 </p>
+                {checkThreshold(sensorVals.sensor3) && <p className="alert">Threshold breached!</p>}
               </div>
             </div>
           </div>
 
           {/* Sound Sensor */}
           <div className="col-md-3">
-            <div className="card mb-4">
+            <div className={`card mb-4 ${checkThreshold(sensorVals.sensor4) ? "bg-danger" : ""}`}>
               <div className="card-body">
                 <h2 className="card-title">Sound Sensor</h2>
                 <p className="card-text" id="t4">
@@ -107,6 +114,7 @@ function App() {
                 <p className="card-subtext">
                   <i className={`icon-${sensorVals.sensor4.icon}`}></i>
                 </p>
+                {checkThreshold(sensorVals.sensor4) && <p className="alert">Threshold breached!</p>}
               </div>
             </div>
           </div>
